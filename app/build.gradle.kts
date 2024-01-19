@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.work.ktx)
     androidTestImplementation(libs.work.testing)
 
+    implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.viewmodel)
     implementation(libs.androidx.livedata)
     implementation(libs.androidx.fragment)
