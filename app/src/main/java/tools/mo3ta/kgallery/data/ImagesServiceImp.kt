@@ -1,19 +1,14 @@
-package tools.mo3ta.githubactivity.data
+package tools.mo3ta.kgallery.data
 
 import io.ktor.client.HttpClient
-import tools.mo3ta.kgallery.data.ImagesService
+import tools.mo3ta.kgallery.data.remote.ImagesService
 import tools.mo3ta.kgallery.model.ImageItem
 
 class ImagesServiceImp(private val httpClient: HttpClient) : ImagesService {
     override suspend fun loadImages(): List<ImageItem> {
-        return listOf(
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg"),
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg", caption = "aaa"),
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg"),
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg", "uuuu"),
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg"),
-            ImageItem("https://randomuser.me/api/portraits/men/32.jpg")
-        )
+        return List(10){
+            ImageItem("https://randomuser.me/api/portraits/men/${it}.jpg")
+        }
     }
 
     override fun closeClient() {

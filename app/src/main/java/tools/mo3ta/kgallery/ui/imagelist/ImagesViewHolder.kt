@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import tools.mo3ta.kgallery.R
+import tools.mo3ta.kgallery.data.local.ImageLocalItem
 import tools.mo3ta.kgallery.model.ImageItem
 
 class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -21,8 +22,8 @@ class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
     }
 
-    fun bind(item: ImageItem) {
-        imageView.load(item.url)
+    fun bind(item: ImageLocalItem) {
+        imageView.load(item.uri)
 
        // tvCaption.text = if (item.caption.isEmpty()) tvCaption.context.getText(R.string.no_caption) else item.caption
         tvCaption.text = item.caption.ifEmpty { tvCaption.context.getText(R.string.no_caption) }
