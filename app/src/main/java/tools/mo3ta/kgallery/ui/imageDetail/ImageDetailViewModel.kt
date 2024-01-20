@@ -1,5 +1,6 @@
 package tools.mo3ta.kgallery.ui.imageDetail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
@@ -34,20 +35,18 @@ class ImageDetailViewModel(private val repo: ImagesRepo): ViewModel() {
         }
     }
 
+
     fun submit(caption: String, width: Int = 0 , height: Int = 0) {
         uiState.value.takeIf { it is UiState.Success }?.let {
             val image = (it as UiState.Success).data
-            if (image.caption != caption){
-                viewModelScope.launch {
-                    repo.updateImage(image.copy(caption = caption))
-                    delay(1000)
-                    _uiState.update { UiState.FinishSubmit }
-                }
-            }else if (width != 0 && height != 0){
+            val needResize = width != 0 && height != 0
+            Log.d("TestTest", "$width $height submit: $needResize")
+            if (needResize){
                     _uiState.update { UiState.Resize(image ,width, height) }
             }
-            else{
-                // no need to update object
+            viewModelScope.launch {
+                repo.updateImage(image.copy(caption = caption))
+                delay(1000)
                 _uiState.update { UiState.FinishSubmit }
             }
         }

@@ -61,23 +61,29 @@ dependencies {
     implementation(libs.logging)
     implementation(libs.serializationKotlinxJson)
     implementation(libs.kotlinx.serialization.json)
+
+    // Coil (Image loading)
     implementation(libs.coil)
 
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     androidTestImplementation(libs.room.testing)
 
-    implementation(libs.work.runtime)
+    // WorkManager
+    // Kotlin + coroutines
     implementation(libs.work.ktx)
     androidTestImplementation(libs.work.testing)
 
+    // ViewModel + LiveData + Lifecycle
     implementation(libs.androidx.lifecycle)
+    // ProcessLifecycleOwner provides a lifecycle for the whole application process
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.viewmodel)
     implementation(libs.androidx.livedata)
     implementation(libs.androidx.fragment)
 
+    // Spin for loading
     implementation(libs.spinKit)
-
-
 }

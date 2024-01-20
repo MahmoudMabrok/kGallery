@@ -27,10 +27,6 @@ class ImageListViewModel(private val repo: ImagesRepo): ViewModel() {
 
     val uiState = _uiState.asStateFlow()
 
-    init {
-        fetchData()
-    }
-
     fun fetchData() {
         _uiState.update { UiState.Loading }
         viewModelScope.launch {
