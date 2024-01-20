@@ -1,5 +1,6 @@
 package tools.mo3ta.kgallery.ui.imagelist
 
+import android.provider.SyncStateContract.Helpers
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import coil.load
 import tools.mo3ta.kgallery.R
 import tools.mo3ta.kgallery.data.local.ImageLocalItem
 import tools.mo3ta.kgallery.model.ImageItem
+import tools.mo3ta.kgallery.ui.Utils
 
 class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -25,7 +27,7 @@ class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: ImageLocalItem) {
         imageView.load(item.uri)
 
-       // tvCaption.text = if (item.caption.isEmpty()) tvCaption.context.getText(R.string.no_caption) else item.caption
-        tvCaption.text = item.caption.ifEmpty { tvCaption.context.getText(R.string.no_caption) }
+        val text =  item.caption.ifEmpty { tvCaption.context.getText(R.string.no_caption) }
+        tvCaption.text = Utils.ellipsize(text.toString())
     }
 }

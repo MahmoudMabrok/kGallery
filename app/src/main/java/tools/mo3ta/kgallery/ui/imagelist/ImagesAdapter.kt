@@ -6,23 +6,23 @@ import androidx.recyclerview.widget.RecyclerView
 import tools.mo3ta.kgallery.data.local.ImageLocalItem
 import tools.mo3ta.kgallery.model.ImageItem
 
-class ImagesAdapter(private var images: MutableList<ImageLocalItem> = mutableListOf()) :
+class ImagesAdapter(private var images: MutableList<ImageLocalItem> = mutableListOf(), private val onClickListener: (item: ImageLocalItem)-> Unit) :
   RecyclerView.Adapter<ImagesViewHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImagesViewHolder {
-    Log.d("TestTest", "onCreateViewHolder:")
-    return ImagesViewHolder.create(parent)
+      return ImagesViewHolder.create(parent).apply {
+
+          this.itemView.setOnClickListener {
+              onClickListener(images[adapterPosition])
+          }
+      }
   }
-
-
   override fun onBindViewHolder(holder: ImagesViewHolder, position: Int) {
     val rowItem = images[position]
     holder.bind(rowItem)
-    Log.d("aaa", "onBindViewHolder: ")
   }
 
   override fun getItemCount(): Int {
-    Log.d("TestTest", "ImagesAdapter getItemCount: ${images.size}")
     return images.size
   }
 

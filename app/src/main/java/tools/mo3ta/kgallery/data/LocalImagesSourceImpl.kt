@@ -21,4 +21,8 @@ class LocalImagesSourceImpl(private val imagesDao: ImagesDao) : LocalImagesSourc
     override suspend fun updateImage(image: ImageLocalItem) {
         imagesDao.updateImage(image)
     }
+
+    override suspend fun getImage(uri: String): ImageLocalItem {
+        return imagesDao.getImage(uri)
+    }
 }

@@ -8,4 +8,8 @@ interface ImagesRepo {
     suspend fun loadAllImages(): Flow< List<ImageLocalItem>>
 
     fun closeClient();
+
+    suspend fun loadImage(uri: String): ImageLocalItem
+
+    suspend fun updateImage(item: ImageLocalItem)
 }

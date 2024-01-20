@@ -2,8 +2,8 @@
     <string name="app_name">kGallery</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="first_fragment_label">Image List</string>
+    <string name="second_fragment_label">Image Details</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -45,4 +45,11 @@
     </string>
     <string name="image_description">image of app</string>
     <string name="no_caption">No Caption</string>
+    <string name="no_search_results">no search results</string>
+    <string name="no_data">No Data</string>
+    <string name="add_image_fromd_device">add image fromd device</string>
+    <string name="submit">Submit</string>
+    <string name="width">Width</string>
+    <string name="height">Height</string>
+    <string name="caption">Caption</string>
 </resources>

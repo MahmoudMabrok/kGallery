@@ -20,6 +20,9 @@ work= "2.9.0"
 spinKit= "1.2.0"
 lifecycle= "2.7.0"
 fragment= "1.6.2"
+nav_version = "2.7.6"
+
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,3 +62,5 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+#// safe-args = { id = "androidx.navigation.navigation-safe-args-gradle-plugin", version.ref = "nav_version" }
+safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "nav_version" }

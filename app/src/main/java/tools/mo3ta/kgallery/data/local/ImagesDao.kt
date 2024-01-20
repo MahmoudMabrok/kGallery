@@ -22,4 +22,7 @@ interface ImagesDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateImage(image: ImageLocalItem)
+
+    @Query("SELECT * FROM images WHERE uri = :uri limit 1")
+    fun getImage(uri: String): ImageLocalItem
 }

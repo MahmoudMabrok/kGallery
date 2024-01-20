@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.safe.args)
 }
 
 android {
@@ -77,4 +78,6 @@ dependencies {
     implementation(libs.androidx.fragment)
 
     implementation(libs.spinKit)
+
+
 }
