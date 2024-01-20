@@ -45,4 +45,6 @@
     </string>
     <string name="image_description">image of app</string>
     <string name="no_caption">No Caption</string>
+    <string name="no_search_results">no search results</string>
+    <string name="no_data">No Data</string>
 </resources>

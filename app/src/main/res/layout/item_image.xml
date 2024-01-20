@@ -20,10 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/no_caption"
-        android:maxLength="80"
-        android:ellipsize="end"
         android:padding="8dp"
-        android:textSize="24sp"
+        android:textSize="14sp"
+        android:background="#4D545252"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/imageView"/>
 

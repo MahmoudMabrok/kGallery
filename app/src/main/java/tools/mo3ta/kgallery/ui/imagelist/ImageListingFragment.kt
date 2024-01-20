@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -51,18 +52,36 @@ class ImageListingFragment : Fragment() {
         binding.rvImages.adapter = adapter
 
         lifecycleScope.launch {
-            viewModel.images.collect {
-                Log.d("TestTest", "onViewCreated: $it")
-               adapter.update(it)
+            viewModel.uiState.collect { state ->
+                binding.rvImages.isVisible = true
+                binding.ilSearch.isVisible = true
+                binding.spinLoading.isVisible = false
+                binding.tvNoData.isVisible = false
+                binding.tvNoSearchResults.isVisible = false
+
+                when (state) {
+                    is UiState.Loading -> {
+                        binding.spinLoading.isVisible = true
+                    }
+
+                    is UiState.Success -> {
+                        adapter.update(state.data)
+                    }
+
+                    is UiState.NoData -> {
+                        binding.tvNoData.isVisible = true
+                    }
+
+                    UiState.NotFound -> {
+                        binding.rvImages.isVisible = false
+                        binding.tvNoSearchResults.isVisible = true
+                    }
+                }
             }
         }
 
         binding.edSearch.doAfterTextChanged {
             viewModel.search(it.toString())
-        }
-
-        binding.ilSearch.setEndIconOnClickListener {
-            viewModel.reset()
         }
     }
 
