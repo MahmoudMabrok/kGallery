@@ -1,6 +1,5 @@
 package tools.mo3ta.kgallery.ui.imagelist
 
-import android.provider.SyncStateContract.Helpers
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import tools.mo3ta.kgallery.R
 import tools.mo3ta.kgallery.data.local.ImageLocalItem
-import tools.mo3ta.kgallery.model.ImageItem
-import tools.mo3ta.kgallery.ui.Utils
+import tools.mo3ta.kgallery.utils.Utils
 
 class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

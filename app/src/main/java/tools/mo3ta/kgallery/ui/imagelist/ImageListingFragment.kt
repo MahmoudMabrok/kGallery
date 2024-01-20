@@ -1,5 +1,6 @@
 package tools.mo3ta.kgallery.ui.imagelist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -47,6 +49,7 @@ class ImageListingFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -57,32 +60,36 @@ class ImageListingFragment : Fragment() {
 
         binding.rvImages.adapter = adapter
 
+        viewModel.fetchData()
+
         lifecycleScope.launch {
-            viewModel.uiState.collect { state ->
-                binding.rvImages.isVisible = true
-                binding.ilSearch.isVisible = true
-                binding.spinLoading.isVisible = false
-                binding.tvNoData.isVisible = false
-                binding.tvNoSearchResults.isVisible = false
+           viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+               viewModel.uiState.collect { state ->
+                   binding.rvImages.isVisible = true
+                   binding.ilSearch.isVisible = true
+                   binding.spinLoading.isVisible = false
+                   binding.tvNoData.isVisible = false
+                   binding.tvNoSearchResults.isVisible = false
 
-                when (state) {
-                    is UiState.Loading -> {
-                        binding.spinLoading.isVisible = true
-                    }
+                   when (state) {
+                       is UiState.Loading -> {
+                           binding.spinLoading.isVisible = true
+                       }
 
-                    is UiState.Success -> {
-                        adapter.update(state.data)
-                    }
+                       is UiState.Success -> {
+                           adapter.update(state.data)
+                       }
 
-                    is UiState.NoData -> {
-                        binding.tvNoData.isVisible = true
-                    }
+                       is UiState.NoData -> {
+                           binding.tvNoData.isVisible = true
+                       }
 
-                    UiState.NotFound -> {
-                        binding.rvImages.isVisible = false
-                        binding.tvNoSearchResults.isVisible = true
-                    }
-                }
+                       UiState.NotFound -> {
+                           binding.rvImages.isVisible = false
+                           binding.tvNoSearchResults.isVisible = true
+                       }
+                   }
+               }
             }
         }
 

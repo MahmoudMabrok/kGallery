@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.imageDetail.ImageDetailsFragment">
+
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        tools:context=".ui.imageDetail.ImageDetailsFragment"
         android:padding="16dp"
         android:orientation="vertical">
 
@@ -17,7 +16,8 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/image_description"
             android:id="@+id/imageView"
-            android:layout_marginBottom="32dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="32dp"
             />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -30,6 +30,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:id="@+id/edWidth"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -43,6 +44,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:id="@+id/edHeight"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -52,6 +54,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/caption"
             android:layout_marginBottom="16dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="80"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -69,4 +73,3 @@
             android:text="@string/submit" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>

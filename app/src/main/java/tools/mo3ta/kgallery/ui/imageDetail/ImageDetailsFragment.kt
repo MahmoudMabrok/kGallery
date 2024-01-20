@@ -1,13 +1,26 @@
 package tools.mo3ta.kgallery.ui.imageDetail
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import coil.load
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,7 +31,7 @@ import tools.mo3ta.kgallery.data.local.ImageLocalItem
 import tools.mo3ta.kgallery.data.local.ImagesDB
 import tools.mo3ta.kgallery.data.remote.ImagesService
 import tools.mo3ta.kgallery.databinding.FragmentImageDetailBinding
-import tools.mo3ta.kgallery.ui.imagelist.ImageListViewModel
+import tools.mo3ta.kgallery.worker.ResizeWorker
 
 
 /**
@@ -39,6 +52,14 @@ class ImageDetailsFragment : Fragment() {
     private val repo by lazy { ImagesRepoImpl(ImagesService.create() , imageLocalSource) }
 
     private val viewModel by lazy { ImageDetailViewModel(repo) }
+
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) {
+            doResizing(requireContext())
+        }
 
 
     override fun onCreateView(
@@ -64,15 +85,63 @@ class ImageDetailsFragment : Fragment() {
                     UiState.FinishSubmit -> findNavController().popBackStack()
                     is UiState.Resize -> {
                         delay(1000)
-                        findNavController().popBackStack()
+
+                        onResizeState()
                     }
                 }
             }
         }
 
         binding.btnSubmit.setOnClickListener {
-            viewModel.submit(binding.edCaption.text.toString())
+            viewModel.submit(binding.edCaption.text.toString(),
+                width = binding.edWidth.text.toString().toIntOrNull() ?: 0 ,
+                height = binding.edHeight.text.toString().toIntOrNull() ?: 0)
         }
+    }
+
+    private fun onResizeState(){
+        Log.d("TestTest", "onResizeState: ")
+
+        // ask for permission to show notifications on android 13+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+            || ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            doResizing(requireContext())
+        } else {
+            requestPermissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
+    }
+
+
+    private fun doResizing(context: Context) {
+        Log.d("TestTest", "doResizing: ")
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val myWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<ResizeWorker>()
+                .setConstraints(constraints)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
+
+        WorkManager.getInstance(context).enqueue(myWorkRequest)
+
+        WorkManager.getInstance(context).getWorkInfoByIdLiveData(myWorkRequest.id).observe(viewLifecycleOwner){
+            Log.d("TestTest", "getWorkInfoByIdLiveData: $it")
+            if (it.state.isFinished){
+                Log.d("TestTest", "doResizing: isFinished")
+            }else{
+                Log.d("TestTest", "doResizing: state${it.state.name}")
+            }
+        }
+
+        findNavController().popBackStack()
     }
 
     private fun updateUI(item: ImageLocalItem) {
