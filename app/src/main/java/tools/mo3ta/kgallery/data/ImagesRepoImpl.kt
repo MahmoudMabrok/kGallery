@@ -26,4 +26,12 @@ class ImagesRepoImpl(private val imagesApi: ImagesService, private val imagesSou
     override fun closeClient() {
         imagesApi.closeClient()
     }
+
+    override suspend fun loadImage(uri: String): ImageLocalItem {
+        return imagesSourceImpl.getImage(uri)
+    }
+
+    override suspend fun updateImage(item: ImageLocalItem) {
+        imagesSourceImpl.updateImage(item)
+    }
 }

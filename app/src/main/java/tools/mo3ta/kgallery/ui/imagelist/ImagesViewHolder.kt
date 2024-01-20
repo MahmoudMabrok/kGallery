@@ -27,7 +27,7 @@ class ImagesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: ImageLocalItem) {
         imageView.load(item.uri)
 
-        val text =  item.caption.ifEmpty { tvCaption.context.getText(R.string.lorem_ipsum) }
+        val text =  item.caption.ifEmpty { tvCaption.context.getText(R.string.no_caption) }
         tvCaption.text = Utils.ellipsize(text.toString())
     }
 }

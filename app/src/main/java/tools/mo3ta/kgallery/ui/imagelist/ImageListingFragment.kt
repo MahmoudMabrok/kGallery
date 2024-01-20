@@ -9,22 +9,25 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import tools.mo3ta.kgallery.R
 import tools.mo3ta.kgallery.data.ImagesRepoImpl
 import tools.mo3ta.kgallery.data.LocalImagesSourceImpl
 import tools.mo3ta.kgallery.data.local.ImagesDB
 import tools.mo3ta.kgallery.data.remote.ImagesService
-import tools.mo3ta.kgallery.databinding.FragmentFirstBinding
+import tools.mo3ta.kgallery.databinding.FragmentListImagesBinding
+import tools.mo3ta.kgallery.ui.imageDetail.ImageDetailsFragmentArgs
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class ImageListingFragment : Fragment() {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentListImagesBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -40,14 +43,17 @@ class ImageListingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentListImagesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = ImagesAdapter()
+        val adapter = ImagesAdapter{
+            // open detail fragment
+            findNavController().navigate( ImageListingFragmentDirections.actionImageListToDetails(it.uri))
+        }
 
         binding.rvImages.adapter = adapter
 

@@ -9,4 +9,5 @@ interface LocalImagesSource {
     suspend fun addImages(image:  List<ImageLocalItem>)
     suspend fun getImages(): Flow<List<ImageLocalItem>>
     suspend fun updateImage(image: ImageLocalItem)
+    suspend fun getImage(uri: String): ImageLocalItem
 }

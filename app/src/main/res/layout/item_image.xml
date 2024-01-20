@@ -22,7 +22,8 @@
         android:text="@string/no_caption"
         android:padding="8dp"
         android:textSize="14sp"
-        android:background="#4D545252"
+        android:textColor="@color/caption_color"
+        android:background="@color/caption_bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/imageView"/>
 
