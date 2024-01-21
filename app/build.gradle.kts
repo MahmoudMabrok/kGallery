@@ -81,7 +81,7 @@ dependencies {
     // WorkManager
     // Kotlin + coroutines
     implementation(libs.work.ktx)
-    androidTestImplementation(libs.work.testing)
+    // androidTestImplementation(libs.work.testing)
 
     // ViewModel + LiveData + Lifecycle
     implementation(libs.androidx.lifecycle)
