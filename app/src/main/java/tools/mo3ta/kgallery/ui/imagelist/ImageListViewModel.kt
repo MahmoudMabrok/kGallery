@@ -1,7 +1,9 @@
 package tools.mo3ta.kgallery.ui.imagelist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,11 +13,13 @@ import tools.mo3ta.kgallery.data.repo.ImagesRepo
 
 
 sealed class UiState{
-    object Loading: UiState()
+    data object Loading: UiState()
     data class Success(val data: List<ImageLocalItem>): UiState()
 
-    object NoData: UiState()
-    object NotFound: UiState()
+    data object NoData: UiState()
+    data object NotFound: UiState()
+
+    data object NoInternetConnection: UiState()
 }
 
 class ImageListViewModel(private val repo: ImagesRepo): ViewModel() {
@@ -27,9 +31,15 @@ class ImageListViewModel(private val repo: ImagesRepo): ViewModel() {
 
     val uiState = _uiState.asStateFlow()
 
+    val handler = CoroutineExceptionHandler { _, throwable ->
+            // _uiState.update { UiState.NoInternetConnection }
+        Log.d("TextText", "CoroutineExceptionHandler: ")
+        }
+
+
     fun fetchData() {
         _uiState.update { UiState.Loading }
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             repo.loadAllImages().collect { imageLocalItems ->
                 if (imageLocalItems.isEmpty()){
                     _uiState.update {

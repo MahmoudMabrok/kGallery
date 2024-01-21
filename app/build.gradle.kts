@@ -28,7 +28,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            buildConfigField("String", "MARVEL_PRIVATE_KEY", "\"\"")
+            buildConfigField("String", "MARVEL_PUBLIC_KEY", "\"\"")
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -38,6 +44,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -86,4 +93,6 @@ dependencies {
 
     // Spin for loading
     implementation(libs.spinKit)
+
+    implementation(libs.androidx.swiperefreshlayout)
 }
