@@ -3,8 +3,6 @@ package tools.mo3ta.kgallery.data
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import tools.mo3ta.kgallery.data.local.ImageLocalItem
 import tools.mo3ta.kgallery.data.local.LocalImagesSource
 import tools.mo3ta.kgallery.data.remote.ImagesService
@@ -40,5 +38,9 @@ class ImagesRepoImpl(private val imagesApi: ImagesService, private val localSour
 
     override suspend fun updateImage(item: ImageLocalItem) {
         localSource.updateImage(item)
+    }
+
+    override suspend fun addImage(uri: String, caption: String, isAppGallery: Boolean) {
+        localSource.addImage(ImageLocalItem(uri, caption = caption, isAppGallery = isAppGallery))
     }
 }

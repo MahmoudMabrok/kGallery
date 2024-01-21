@@ -23,6 +23,7 @@ import tools.mo3ta.kgallery.data.LocalImagesSourceImpl
 import tools.mo3ta.kgallery.data.local.ImagesDB
 import tools.mo3ta.kgallery.data.remote.ImagesService
 import tools.mo3ta.kgallery.databinding.FragmentListImagesBinding
+import tools.mo3ta.kgallery.ui.addImage.AddImageDialogFragment
 import tools.mo3ta.kgallery.ui.imageDetail.ImageDetailsFragmentArgs
 
 /**
@@ -47,6 +48,7 @@ class ImageListingFragment : Fragment() {
         _binding = FragmentListImagesBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,6 +85,10 @@ class ImageListingFragment : Fragment() {
         binding.swiperefresh.setOnRefreshListener {
             binding.swiperefresh.isRefreshing = false
             viewModel.fetchData()
+        }
+
+        binding.fabAdd.setOnClickListener {
+            AddImageDialogFragment().show(childFragmentManager, AddImageDialogFragment.TAG)
         }
     }
 

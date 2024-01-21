@@ -53,4 +53,6 @@
     <string name="height">Height</string>
     <string name="caption">Caption</string>
     <string name="search">Search</string>
+    <string name="open_gallery">open gallery</string>
+    <string name="connected">Connected</string>
 </resources>
