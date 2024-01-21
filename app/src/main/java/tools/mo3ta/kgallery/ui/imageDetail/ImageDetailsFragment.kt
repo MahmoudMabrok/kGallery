@@ -21,17 +21,20 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import coil.imageLoader
 import coil.load
-import kotlinx.coroutines.delay
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import tools.mo3ta.kgallery.DIHelper
 import tools.mo3ta.kgallery.R
-import tools.mo3ta.kgallery.data.ImagesRepoImpl
-import tools.mo3ta.kgallery.data.LocalImagesSourceImpl
 import tools.mo3ta.kgallery.data.local.ImageLocalItem
-import tools.mo3ta.kgallery.data.local.ImagesDB
-import tools.mo3ta.kgallery.data.remote.ImagesService
 import tools.mo3ta.kgallery.databinding.FragmentImageDetailBinding
+import tools.mo3ta.kgallery.utils.Utils
 import tools.mo3ta.kgallery.worker.ResizeWorker
+import tools.mo3ta.kgallery.worker.UpdateCaptionWorker
 
 
 /**
@@ -47,9 +50,7 @@ class ImageDetailsFragment : Fragment() {
 
     private val args : ImageDetailsFragmentArgs by navArgs()
 
-    private val imagesDao by lazy { ImagesDB.createDB(requireContext()).imagesDAO()}
-    private val imageLocalSource by lazy { LocalImagesSourceImpl(imagesDao) }
-    private val repo by lazy { ImagesRepoImpl(ImagesService.create() , imageLocalSource) }
+    private val repo by lazy { DIHelper.getInstance(requireContext()).repo }
 
     private val viewModel by lazy { ImageDetailViewModel(repo) }
 
@@ -58,7 +59,11 @@ class ImageDetailsFragment : Fragment() {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) {
-            doResizing(requireContext())
+            try {
+                doResizing(requireContext())
+            } catch (_: Exception) {
+
+            }
         }
 
 
@@ -84,19 +89,39 @@ class ImageDetailsFragment : Fragment() {
                     is UiState.Success -> updateUI(state.data)
                     UiState.FinishSubmit -> findNavController().popBackStack()
                     is UiState.Resize -> {
-                        delay(1000)
-
                         onResizeState()
+                    }
+
+                    is UiState.ScheduleUpdateCaption -> {
+                        scheduleUpdate(requireContext() , state.data , state.caption)
                     }
                 }
             }
         }
 
-        binding.btnSubmit.setOnClickListener {
-            viewModel.submit(binding.edCaption.text.toString(),
-                width = binding.edWidth.text.toString().toIntOrNull() ?: 0 ,
-                height = binding.edHeight.text.toString().toIntOrNull() ?: 0)
+        binding.imageData.btnSubmit.setOnClickListener {
+            viewModel.submit(
+                Utils.isNetworkConnected(requireContext()),
+                binding.imageData.edCaption.text.toString(),
+                binding.imageData.edWidth.text.toString().toIntOrNull() ?: 0 ,
+                binding.imageData.edHeight.text.toString().toIntOrNull() ?: 0)
         }
+    }
+
+    private fun scheduleUpdate(context: Context, data: ImageLocalItem, caption: String) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val myWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<UpdateCaptionWorker>()
+                .setConstraints(constraints)
+                .setInputData(UpdateCaptionWorker.createInputData(data.uri , caption))
+                .build()
+
+        WorkManager.getInstance(context).enqueue(myWorkRequest)
+
+        findNavController().popBackStack()
     }
 
     private fun onResizeState(){
@@ -117,7 +142,6 @@ class ImageDetailsFragment : Fragment() {
         }
     }
 
-
     private fun doResizing(context: Context) {
         Log.d("TestTest", "doResizing: ")
         val constraints = Constraints.Builder()
@@ -132,22 +156,40 @@ class ImageDetailsFragment : Fragment() {
 
         WorkManager.getInstance(context).enqueue(myWorkRequest)
 
-        WorkManager.getInstance(context).getWorkInfoByIdLiveData(myWorkRequest.id).observe(viewLifecycleOwner){
-            Log.d("TestTest", "getWorkInfoByIdLiveData: $it")
-            if (it.state.isFinished){
-                Log.d("TestTest", "doResizing: isFinished")
-            }else{
-                Log.d("TestTest", "doResizing: state${it.state.name}")
-            }
-        }
-
         findNavController().popBackStack()
     }
 
     private fun updateUI(item: ImageLocalItem) {
-        binding.imageView.load(item.uri)
-        binding.edCaption.setText(item.caption)
-        binding.edCaption.error = if (item.caption.isEmpty()) getString(R.string.no_caption) else null
+        val imageLoader = requireContext().imageLoader
+        val request = ImageRequest.Builder(requireContext())
+            .data(item.uri)
+            .allowHardware(false)
+            .listener (onSuccess = { _: ImageRequest, successResult: SuccessResult ->
+                val drawable = successResult.drawable
+                val width = drawable.intrinsicWidth
+                val height = drawable.intrinsicHeight
+                viewModel.updateSize(width, height)
+                binding.imageData.edWidth.setText(width.toString())
+                binding.imageData.edHeight.setText(height.toString())
+                binding.imageData.imageView.setImageDrawable(drawable)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val color = Utils.getDominantColor(drawable)
+                    withContext(Dispatchers.Main){
+                        binding.pageContainer.setBackgroundColor(color)
+                    }
+                }
+            })
+            .build()
+
+        imageLoader.enqueue(request)
+
+
+        binding.imageData.imageView.load(item.uri){
+
+        }
+        binding.imageData.edCaption.setText(item.caption)
+        binding.imageData.edCaption.error = if (item.caption.isEmpty()) getString(R.string.no_caption) else null
+        binding.imageData.imageView.load(item.uri)
     }
 
     override fun onDestroyView() {

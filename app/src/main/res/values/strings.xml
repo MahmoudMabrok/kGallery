@@ -52,4 +52,5 @@
     <string name="width">Width</string>
     <string name="height">Height</string>
     <string name="caption">Caption</string>
+    <string name="search">Search</string>
 </resources>

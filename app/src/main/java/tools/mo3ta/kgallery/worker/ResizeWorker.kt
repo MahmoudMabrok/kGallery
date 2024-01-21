@@ -1,6 +1,5 @@
 package tools.mo3ta.kgallery.worker
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -18,7 +17,7 @@ class ResizeWorker(context: Context, workerParams: WorkerParameters) : Coroutine
 
     companion object {
         const val channelId = "resize_channel"
-        const val NOTIFICATION_ID = 1
+        var NOTIFICATION_ID = 1
     }
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
@@ -29,6 +28,9 @@ class ResizeWorker(context: Context, workerParams: WorkerParameters) : Coroutine
 
 
     override suspend fun doWork(): Result {
+        // to be unique each time
+        NOTIFICATION_ID += 1
+
         createNotificationChannel()
 
         Log.d("TestTest", "doWork: ")
@@ -43,6 +45,9 @@ class ResizeWorker(context: Context, workerParams: WorkerParameters) : Coroutine
         return Result.success()
     }
 
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())
+    }
     private suspend fun showProgress(progress: Int) {
         val notification = notificationBuilder
             .setProgress(100, progress, false)

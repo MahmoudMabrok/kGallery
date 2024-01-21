@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import tools.mo3ta.kgallery.DIHelper
 import tools.mo3ta.kgallery.R
 import tools.mo3ta.kgallery.data.ImagesRepoImpl
 import tools.mo3ta.kgallery.data.LocalImagesSourceImpl
@@ -35,9 +36,7 @@ class ImageListingFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val imagesDao by lazy { ImagesDB.createDB(requireContext()).imagesDAO()}
-    private val imageLocalSource by lazy { LocalImagesSourceImpl(imagesDao)}
-    private val repo by lazy { ImagesRepoImpl(ImagesService.create() , imageLocalSource)}
+    private val repo by lazy { DIHelper.getInstance(requireContext()).repo }
 
     private val viewModel by lazy { ImageListViewModel(repo) }
 
@@ -65,29 +64,13 @@ class ImageListingFragment : Fragment() {
         lifecycleScope.launch {
            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
                viewModel.uiState.collect { state ->
-                   binding.rvImages.isVisible = true
-                   binding.ilSearch.isVisible = true
-                   binding.spinLoading.isVisible = false
-                   binding.tvNoData.isVisible = false
-                   binding.tvNoSearchResults.isVisible = false
+                   binding.rvImages.isVisible = state is UiState.Success
+                   binding.spinLoading.isVisible = state is UiState.Loading
+                   binding.tvNoData.isVisible = state is UiState.NoData
+                   binding.tvNoSearchResults.isVisible = state is UiState.NotFound
 
-                   when (state) {
-                       is UiState.Loading -> {
-                           binding.spinLoading.isVisible = true
-                       }
-
-                       is UiState.Success -> {
-                           adapter.update(state.data)
-                       }
-
-                       is UiState.NoData -> {
-                           binding.tvNoData.isVisible = true
-                       }
-
-                       UiState.NotFound -> {
-                           binding.rvImages.isVisible = false
-                           binding.tvNoSearchResults.isVisible = true
-                       }
+                   if (state is UiState.Success) {
+                      adapter.update(state.data)
                    }
                }
             }
@@ -95,6 +78,11 @@ class ImageListingFragment : Fragment() {
 
         binding.edSearch.doAfterTextChanged {
             viewModel.search(it.toString())
+        }
+
+        binding.swiperefresh.setOnRefreshListener {
+            binding.swiperefresh.isRefreshing = false
+            viewModel.fetchData()
         }
     }
 
