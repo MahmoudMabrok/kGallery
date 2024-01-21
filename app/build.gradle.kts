@@ -95,4 +95,6 @@ dependencies {
     implementation(libs.spinKit)
 
     implementation(libs.androidx.swiperefreshlayout)
+
+    implementation(libs.imagepicker)
 }

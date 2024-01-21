@@ -3,6 +3,7 @@ package tools.mo3ta.kgallery.ui.imageDetail
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -71,7 +72,6 @@ class ImageDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentImageDetailBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -160,33 +160,34 @@ class ImageDetailsFragment : Fragment() {
     }
 
     private fun updateUI(item: ImageLocalItem) {
-        val imageLoader = requireContext().imageLoader
-        val request = ImageRequest.Builder(requireContext())
-            .data(item.uri)
-            .allowHardware(false)
-            .listener (onSuccess = { _: ImageRequest, successResult: SuccessResult ->
-                val drawable = successResult.drawable
-                val width = drawable.intrinsicWidth
-                val height = drawable.intrinsicHeight
-                viewModel.updateSize(width, height)
-                binding.imageData.edWidth.setText(width.toString())
-                binding.imageData.edHeight.setText(height.toString())
-                binding.imageData.imageView.setImageDrawable(drawable)
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val color = Utils.getDominantColor(drawable)
-                    withContext(Dispatchers.Main){
-                        binding.pageContainer.setBackgroundColor(color)
+
+        if (item.isAppGallery){
+            binding.imageData.imageView.setImageURI(Uri.parse(item.uri))
+        }else{
+            val imageLoader = requireContext().imageLoader
+            val request = ImageRequest.Builder(requireContext())
+                .data(item.uri)
+                .allowHardware(false)
+                .listener (onSuccess = { _: ImageRequest, successResult: SuccessResult ->
+                    val drawable = successResult.drawable
+                    val width = drawable.intrinsicWidth
+                    val height = drawable.intrinsicHeight
+                    viewModel.updateSize(width, height)
+                    binding.imageData.edWidth.setText(width.toString())
+                    binding.imageData.edHeight.setText(height.toString())
+                    binding.imageData.imageView.setImageDrawable(drawable)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val color = Utils.getDominantColor(drawable)
+                        withContext(Dispatchers.Main){
+                            binding.pageContainer.setBackgroundColor(color)
+                        }
                     }
-                }
-            })
-            .build()
+                })
+                .build()
 
-        imageLoader.enqueue(request)
-
-
-        binding.imageData.imageView.load(item.uri){
-
+            imageLoader.enqueue(request)
         }
+
         binding.imageData.edCaption.setText(item.caption)
         binding.imageData.edCaption.error = if (item.caption.isEmpty()) getString(R.string.no_caption) else null
         binding.imageData.imageView.load(item.uri)
